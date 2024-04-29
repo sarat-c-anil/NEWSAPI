@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>News Details</title>
+</head>
+<body>
+  <h1>{{ news.headline }}</h1>
+  <img src="{{ news_img }}" alt="News Image" width="300" height="200">
+  <p>{{ news.short_description }}</p> 
+  <p><a href="{{ news_link }}" target="_blank">Read Full Article</a></p>  <!-- Use news_link variable for the link -->
+
+  <h2>Recommended Articles</h2>
+  <div id="recommendations"></div>
+
+  <script>
+    const recommendationsDiv = document.getElementById('recommendations');
+
+    // Function to display recommendations
+    function displayRecommendations(recommendations) {
+      recommendations.forEach(article => {
+        const articleDiv = document.createElement('div');
+        articleDiv.innerHTML = `
+          <p>${article.headline} <a href="/news/${article.id}">(Read More)</a></p>
+          <img src="${article.image_url}" alt="Recommended News Image" width="300" height="200">  <!-- Display recommended news image -->
+          <p>${article.short_description}</p>
+          <p><a href="#" class="read-more-link" data-news-id="${article.id}">Read Full Article</a></p>
+        `;
+        recommendationsDiv.appendChild(articleDiv);
+      });
+    }
+
+    // Redirect to the original news link based on news ID
+    function redirectToOriginalLink(newsId) {
+      // Fetch the news link based on news ID from the server
+      fetch(`/news/${newsId}/link`)
+        .then(response => response.json())
+        .then(data => {
+          const originalLink = data.link;
+          if (originalLink) {
+            window.open(originalLink, '_blank');  // Open link in a new tab
+          } else {
+            console.error('Original link not found');
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching original link:', error);
+        });
+    }
+
+    // Event listener for recommended news "Read Full Article" links
+    document.addEventListener('click', (event) => {
+      if (event.target.classList.contains('read-more-link')) {
+        event.preventDefault();  // Prevent default link behavior
+        const newsId = event.target.dataset.newsId;
+        redirectToOriginalLink(newsId);
+      }
+    });
+
+    // Load recommendations when the page loads
+    window.addEventListener('DOMContentLoaded', () => {
+      const recommendations = {{ recommendations | tojson | safe }};
+      displayRecommendations(recommendations);
+    });
+  </script>
+</body>
+</html>
