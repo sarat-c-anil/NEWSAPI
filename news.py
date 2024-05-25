@@ -56,7 +56,6 @@ def insert_articles(articles, category):
     print(f"{len(articles)} articles added for category: {category}")
 
 def fetch_and_store_news(categories, country_code='in'):
-    categories.append('sports')  # Add 'sports' category
     for category in categories:
         top_headlines = newsapi.get_top_headlines(category=category, language='en', country=country_code.lower())
         articles = top_headlines['articles'] if 'articles' in top_headlines else []
@@ -76,12 +75,11 @@ def update_news():
     fetch_and_store_news(categories)
 
 def main():
-    # Add 'sports' category to the existing list of categories
-    categories = ['business', 'entertainment', 'general', 'health', 'science', 'technology']
-    categories.append('sports')
+    # Run the update_news function initially
+    update_news()
 
-    # Run the update for all categories including 'sports'
-    fetch_and_store_news(categories)
+    # Schedule the update_news function to run every 5 minutes
+    schedule.every(2).minutes.do(update_news)
 
     while True:
         # Check for scheduled tasks
