@@ -211,12 +211,12 @@ def index():
     # Fetch the latest news of the user's interests
     news_list = []
     for interest in interests:
-        cursor.execute('''SELECT id, headline, category FROM news WHERE category = ? ORDER BY id DESC''', (interest,))
-        news_list.extend([{'id': row[0], 'headline': row[1], 'category': row[2]} for row in cursor.fetchall()])
+        cursor.execute('''SELECT id, headline, category, image_url FROM news WHERE category = ? ORDER BY id DESC''', (interest,))
+        news_list.extend([{'id': row[0], 'headline': row[1], 'category': row[2], 'image_url': row[3]} for row in cursor.fetchall()])
 
     # Fetch other news not in the user's interests
-    cursor.execute('''SELECT id, headline, category FROM news WHERE category NOT IN ({}) ORDER BY id DESC'''.format(','.join(['?'] * len(interests))), interests)
-    other_news = [{'id': row[0], 'headline': row[1], 'category': row[2]} for row in cursor.fetchall()]
+    cursor.execute('''SELECT id, headline, category, image_url FROM news WHERE category NOT IN ({}) ORDER BY id DESC'''.format(','.join(['?'] * len(interests))), interests)
+    other_news = [{'id': row[0], 'headline': row[1], 'category': row[2], 'image_url': row[3]} for row in cursor.fetchall()]
 
     # Combine the news lists, ensuring the user's interests are displayed first
     sorted_news_list = news_list + other_news
@@ -227,12 +227,13 @@ def index():
 
 
 
+
 @app.route('/category/<string:category_name>')
 def category_news(category_name):
     db = get_db(NEWS_DATABASE)
     cursor = db.cursor()
-    cursor.execute('''SELECT id, headline, category FROM news WHERE category = ?''', (category_name,))
-    category_news_list = [{'id': row[0], 'headline': row[1], 'category': row[2]} for row in cursor.fetchall()]
+    cursor.execute('''SELECT id, headline, category , image_url FROM news WHERE category = ?''', (category_name,))
+    category_news_list = [{'id': row[0], 'headline': row[1], 'category': row[2],'image_url': row[3]} for row in cursor.fetchall()]
     categories = set([row['category'] for row in category_news_list])
     return render_template('category_news.html', category_name=category_name, news_list=category_news_list, categories=categories)
 
