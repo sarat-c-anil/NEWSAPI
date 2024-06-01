@@ -32,6 +32,11 @@
   <div id="newsList">
     {% for news_item in news_list %}
     <p>{{ news_item.headline }} (Category: {{ news_item.category }}) <a href="/news/{{ news_item.id }}">(Read More)</a></p>
+    {% if news_item.image_url %}
+    <img src="{{ news_item.image_url }}" alt="News Image" width="300" height="200">
+    {% else %}
+    <p>No image available</p>
+    {% endif %}
     {% endfor %}
   </div>
 
@@ -44,7 +49,7 @@
       if (selectedCategory !== 'all') {
         window.location.href = `/category/${selectedCategory}`;
       } else {
-        window.location.href = '/';
+        window.location.href = '/index';
       }
     });
   </script>
